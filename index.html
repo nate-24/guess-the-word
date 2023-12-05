@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>guess the word (taylor's version)</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@1&display=swap" rel="stylesheet">
+        <style>
+            body {
+                background-color:lightgrey;
+                color:gray;
+                font-family: 'IM Fell DW Pica', serif;
+                text-align: center;
+                size: 30
+            }
+        </style>
+    </head>
+    <body>
+        <p>- g u e s s - t h e - w o r d -</p>
+        <p id="word">w o r d</p>
+        <p id="message"></p>
+        <p id="guesses-left">you have 3 more guesses left.</p>
+        <label for="guess">enter a letter:</label>
+        <br>
+        <input type="text" id="guess" name="guess" size="1" minlength="1" maxlength="1">
+        <br><br>
+        <input type="button" id="insert-letter" value="guess">
+        <p>- used letters -</p>
+        <p id="used-letters">w a n e g b t</p>
+
+        <script>
+            const wordOut = document.querySelector('#word');
+            const usedLettersOut = document.querySelector('#used-letters');
+            const messageOut = document.querySelector('#message');
+            const guessesLeftOut = document.querySelector('#guesses-left');
+            const guessIn = document.querySelector('#guess');
+            const guessButton = document.querySelector('#insert-letter');
+
+            let wordList = getWordsThenStart();
+            let word;
+            let usedLetters;
+            let guessesLeft;
+
+            //start a new game
+           function startGame() {
+               word = selectWord();
+               usedLetters = '';
+               guessesLeft = 10;
+               updateWord();
+               usedLettersOut.innerText = usedLetters;
+               guessesLeftOut.innerText = `you have ${guessesLeft} guesses left`;
+               guessIn.addEventListener('change', handleGuess);
+               guessButton.addEventListener('click', handleGuess);
+           }
+           
+           //return a random word from the word list and remove it from the list
+           function selectWord() {
+            const index = Math.floor(Math.random() * wordList.length);
+            console.log(`index = ${index}`); 
+            let w = wordList[index].trim().toUpperCase();
+            wordList.splice(index, 1); //delete word from list
+            console.log(`word = ${w}`);
+            return w;
+           }           
+
+        // fetch a list of words from a file
+        async function getWordsThenStart() {
+            const response = await fetch(
+                "https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt"
+            );
+            console.log(response);
+            const content = await response.text();
+            wordList = content.split("\n");
+            
+            console.log(`loaded ${wordList.length} words`)
+            console.log(wordList);
+            startGame();
+            }
+
+        //show the word with guessed letters
+        function updateWord() {
+            let s = "";
+            let done = true;
+            for (const c of word) {
+                console.log (c);
+                if (usedLetters.includes(c)) {
+                    s += c;
+                } else {
+                    s += "☆ ";
+                    done = false;
+                }
+            }
+            wordOut.innerText = s;
+            if (done) {
+                win();
+            }
+        }
+
+        function handleGuess() {
+            console.log('handleGuess called');
+            let guess = guessIn.value;
+            guessIn.value = '';
+            guess = guess.toUpperCase();
+            usedLetters += guess;
+            usedLettersOut.innerText = usedLetters;
+            if (word.includes(guess)) {
+                messageOut.innerText = `there is a ${guess} in the word`;
+            } else {
+                messageOut.innerText = `there is not a ${guess} in the word`;
+                guessesLeft -= 1;
+                guessesLeftOut.innerText = `you have ${guessesLeft} guesses left`;
+                if (guessesLeft == 0) {
+                    lose();
+                }
+            }
+            updateWord();
+        }
+
+        function win() {
+            console.log('win');
+            messageOut.innerText = 'you win! reload to play again';
+        }
+
+        function lose() {
+            console.log('lose');
+            messageOut.innerText = 'you lost! reload to play again';
+        }
+
+        </script>
+    </body>
+</html>
