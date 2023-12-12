@@ -12,7 +12,16 @@
                 color:gray;
                 font-family: 'IM Fell DW Pica', serif;
                 text-align: center;
-                size: 30
+                font-size: 30px;
+            }
+            input {
+                font-size: 25px;
+                font-family: 'IM Fell DW Pica', serif;
+                text-align: center;
+            }
+            #play-again {
+                display: none;
+                margin: 10px auto;
             }
         </style>
     </head>
@@ -20,6 +29,7 @@
         <p>- g u e s s - t h e - w o r d -</p>
         <p id="word">w o r d</p>
         <p id="message"></p>
+        <input type="button" id="play-again" value="play again">
         <p id="guesses-left">you have 3 more guesses left.</p>
         <label for="guess">enter a letter:</label>
         <br>
@@ -27,7 +37,7 @@
         <br><br>
         <input type="button" id="insert-letter" value="guess">
         <p>- used letters -</p>
-        <p id="used-letters">w a n e g b t</p>
+        <p id="used-letters"></p>
 
         <script>
             const wordOut = document.querySelector('#word');
@@ -36,6 +46,7 @@
             const guessesLeftOut = document.querySelector('#guesses-left');
             const guessIn = document.querySelector('#guess');
             const guessButton = document.querySelector('#insert-letter');
+            const playAgain = document.querySelector('#play-again');
 
             let wordList = getWordsThenStart();
             let word;
@@ -101,6 +112,7 @@
             console.log('handleGuess called');
             let guess = guessIn.value;
             guessIn.value = '';
+            if (guess.length === 0) return;
             guess = guess.toUpperCase();
             usedLetters += guess;
             usedLettersOut.innerText = usedLetters;
@@ -119,12 +131,22 @@
 
         function win() {
             console.log('win');
-            messageOut.innerText = 'you win! reload to play again';
+            messageOut.innerText = 'you win!';
+            playAgain.style["display"]='block';
+        }
+
+        playAgain.addEventListener('click', reload);
+
+        function reload() {
+            location.reload();
         }
 
         function lose() {
             console.log('lose');
-            messageOut.innerText = 'you lost! reload to play again';
+            messageOut.innerText = 'you lost!';
+            guessIn.setAttribute("disabled", true);
+            guessButton.setAttribute("disabled", true);
+            playAgain.style["display"]='block';
         }
 
         </script>
